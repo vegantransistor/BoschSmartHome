@@ -42,6 +42,8 @@ If you want to build it, here is the pinout of the RF Module (top view):
 
 ![px](./pictures/px.png)
 
+Connect the SPI signals (CS, CLK, MOSI, MISO) to the Bus Pirate SPI interface and VCC to 3,3 V.
+
 I wrote a small old-school C program to access and configure the Bus Pirate in raw SPI mode (faster than normal mode) and to configure the CC101 with the parameters extracted above. Simple state machines are used to receive or send arbitrary packets and perform manipulations. Here you can see some received packets using the device as a sniffer:
 
 ![p6](./pictures/p6.png)
