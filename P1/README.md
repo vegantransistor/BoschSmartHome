@@ -91,4 +91,21 @@ Our first small application runs in the device -without signature. Normally, at 
 
 ![delay](./pictures/delay.png)
 
+We have a console:
 
+![uboot](./pictures/uboot.png)
+
+
+Having done that, our next goal is to change the Linux root password in the device in order to "be root" without manipulating the hardware. First we search the dumped flash content for the typical root password hash format. Replacing it on place with an own root password hash (generated with openssl passwd) was possible with the uBoot console using the mmc commands *mmc write*.
+
+![root1](./pictures/root1.png)![root2](./pictures/root2.png)
+
+And that's it.
+
+![root](./pictures/root.png)
+
+**Conclusion**
+
+In this post, I described how to root the Bosch SmartHome Controller I, exploiting a secure boot bug (buffer overflow / stack corruption) and some other interesting hardware security aspects. To exploit this vulnerability, only a soldering iron and a SD card are needed - besides the required adversarial thinking.
+
+I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020.
