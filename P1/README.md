@@ -1,4 +1,4 @@
-# Rooting the Bosch SmartHome Controller
+# Rooting the Bosch SmartHome Controller I
 
 During Christmas holidays 2019 I had a lot of time and I decided to have a look at the Bosch SmartHome Controller (version 1) from a hardware security perspective. I bought one from the local Obi [hardware store](https://www.obi.de/hausfunksteuerung/bosch-controller-smart-home-weiss/p/1229350) and began to disassemble it thanks [iFixit](https://www.ifixit.com), here is a picture:
 
