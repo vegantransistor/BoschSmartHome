@@ -4,6 +4,8 @@ In [part 2](./../P2/README.md) we performed an electromagnetic fault injection o
 
 The results have been shared with Bosch PSIRT (2021-11-25).
 
+The code for the simple fuzzer is [here](./code/).
+
 ## The device
 
 The Rolladensteuerung (shutter control) is again our guest for today:
