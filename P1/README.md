@@ -13,26 +13,26 @@ Due to:
 * The peripherals (DDR3,…)
 * The application (IoT)
 
-… the best candidate was the TI Sitara AM335x processor in "High Security" (HS)variant. Confirmation came from the pin assignment. Interestingly, I found a [related work with the same IC](https://www.usenix.org/system/files/woot19-paper_ullrich.pdf). In this work they did a cold boot attack on the system exploiting a vulnerability in the QNX bootloader. This was not possible here.
+… the best candidate was the TI Sitara AM335x processor in "High Security" (HS) variant. Confirmation came from the pin assignment. Interestingly, I found a [related work with the same IC](https://www.usenix.org/system/files/woot19-paper_ullrich.pdf). In this work they did a cold boot attack on the system exploiting a vulnerability in the QNX bootloader. This was not possible here.
 
-The next step was to "sniff" the primary UART communication(UART0) which normally gives information about the boot process and the firmware. Finding the UART TX test point was not difficult but time intensive (connect [oscilloscope](https://www.picotech.com/oscilloscope/) to a new test point, reset, wait and see - goto begin):
+The next step was to "sniff" the primary UART communication (UART0) which normally gives information about the boot process and the firmware. Finding the UART TX test point was not difficult:
 
 ![UART](./pictures/uart.png)
 
 And this is what came out:
 
-TBD: pic
+![shcboot](./pictures/shcboot.png)
 
-We see that Linux is implemented with uBoot SPL and uBoot as bootloaders. We also see that secure boot is in place ("Verifying secure image"), so that only signed firmware can (shall) be executed. I did not found the UART *RX* Interface at first, needed to transfer data from the PC to the device (ok, one could have redirected the UART standard communication to UART1 or 2 but we want to do HW). In fact, after desoldering the processor I found out that it was not connected / wired at all!
+We see that Linux is implemented with uBoot SPL and uBoot as bootloaders. We also see that secure boot is in place ("Verifying secure image"), so that only signed firmware can (shall) be executed. I did not found the UART *RX* Interface at first, needed to transfer data from the PC to the device. In fact, after desoldering the processor I found out that it was not connected / wired at all!
 Here is the location of the RX pin:
 
 ![RX](./pictures/am335x.png)
 
-The UART RX ball is located in the middle of the device (red dot), not easily available from outside. With professional BGA reworking tools, it is possible to 1) desolder the BGA 2) solder a wire to this ball 3) resolder the BGA. But I do not have that kind of equipment and therefore I wanted to do something simpler: threading an 0.15 mm enameled copper wire (in German Kupferlackdraht, one of the most important hacker tools) under the BGA, stripping the insulating layer only for a few tenths of millimeters and trying to contact the particular ball. This happened to work well (after some trials and it still works):
+The UART RX ball is located in the middle of the device (red dot), not easily available from outside. With professional BGA reworking tools, it is possible to 1) desolder the BGA 2) solder a wire to this ball 3) resolder the BGA. But I do not have that kind of equipment and therefore I wanted to do something simpler: threading an 0.15 mm enameled copper wire (in German Kupferlackdraht, one of the most important hacker tools) under the BGA, stripping the insulating layer only for a few tenths of millimeters and trying to contact the particular ball. This happened to work well (it still works):
 
 ![Kupferlackdraht](./pictures/kupferlack.png)
 
-Now we come to the point where one device will get hurt (sensitive minds please skip this section).
+*Now we come to the point where one device will get hurt (sensitive minds please skip this section).*
 
 Obviously, next step is to dump the flash content. An eMMC flash can be read out with a standard SD card reader, so that soldering a card reader to the eMMC has been done. I decided to desolder the processor and then solder the wires involved to the eMMC interface (6 wires):
 
@@ -59,9 +59,9 @@ The [user manual](https://www.ti.com/lit/ug/spruh73q/spruh73q.pdf) gives us some
 
 ![stack](./pictures/stack.png)
 
-The BootROM needs a stack in OCRAM located at 0x4030B800 and in the same time the image is loaded in OCRAM at address 0x403000000. "It will be apparent to those skills in the art" that a stack corruption can happen if too many data are loaded. And this is exactly what happens when we increase the size of the ISW part to an "illegal" value. 
+The BootROM needs a stack in OCRAM located at 0x4030B800 and in the same time the image is loaded in OCRAM at address 0x403000000. *It will be apparent to those skills in the art* that a stack corruption can happen if too many data are loaded. And this is exactly what happens when we increase the size of the ISW part to an "illegal" value. 
 
-We can place a valid return address at a specific place of the increased ISW and the program pointer is then loaded with this address at the next function call return (my guess, something like "pop pc"). So we can place our own code at some place in the ISW part, putting the magic address and our code is executed… BEFOREthe signature is checked! This means: secure boot is probably broken.
+We can place a valid return address at a specific place of the increased ISW and the program pointer is then loaded with this address at the next function call return (something like "pop pc"). So we can place our own code at some place in the ISW part, putting the magic address and our code is executed… BEFOREthe signature is checked! This means: secure boot is probably broken.
 
 **Summary: How does secure boot process is bypassed (guesses):**
 
@@ -87,7 +87,7 @@ At boot time, the MMC1 interface must be made unavailable (grounding the clock w
 
 ![boot](./pictures/boot.png)
 
-Our first small application runs in the device -without signature. Normally, at this stage, uBoot is loaded into SDRAM and runs. Our goal is now to get a uBoot console. If not secured, uBoot can be easily interrupted, see for example the work of [Colin O'Flynn on the Philips Hue device](https://colinoflynn.com/2016/07/getting-root-on-philips-hue-bridge-2-0/). This particular hack (disturbing the flash loading process) did not work in the Bosch SmartHome Controller. If we have a look at the uBoot binary, we see that the environmental variables are embedded in the binary (found in the u-boot.img file). Integrity of these variables is checked by secure boot -broken now. We can manipulate one specific variable "bootdelay" from 0 (no delay) to 9 (9 seconds delay) so that uBoot can be interrupted and a console is available:
+Our first small application runs in the device **without signature**. Normally, at this stage, uBoot is loaded into SDRAM and runs. Our goal is now to get a uBoot console. If not secured, uBoot can be easily interrupted, see for example the work of [Colin O'Flynn on the Philips Hue device](https://colinoflynn.com/2016/07/getting-root-on-philips-hue-bridge-2-0/). This particular hack (disturbing the flash loading process) did not work in the Bosch SmartHome Controller I. If we have a look at the uBoot binary, we see that the environmental variables are embedded in the binary (found in the u-boot.img file). Integrity of these variables is checked by secure boot - broken now. We can manipulate one specific variable "bootdelay" from 0 (no delay) to 9 (9 seconds delay) so that uBoot can be interrupted and a console is available:
 
 ![delay](./pictures/delay.png)
 
@@ -98,7 +98,7 @@ We have a console:
 
 Having done that, our next goal is to change the Linux root password in the device in order to "be root" without manipulating the hardware. First we search the dumped flash content for the typical root password hash format. Replacing it on place with an own root password hash (generated with openssl passwd) was possible with the uBoot console using the mmc commands *mmc write*.
 
-![root1](./pictures/root1.png)![root2](./pictures/root2.png)
+![root2](./pictures/root2.png)![root1](./pictures/root1.png)
 
 And that's it.
 
@@ -107,5 +107,7 @@ And that's it.
 **Conclusion**
 
 In this post, I described how to root the Bosch SmartHome Controller I, exploiting a secure boot bug (buffer overflow / stack corruption) and some other interesting hardware security aspects. To exploit this vulnerability, only a soldering iron and a SD card are needed - besides the required adversarial thinking.
+
+**Disclosure**
 
 I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020.
