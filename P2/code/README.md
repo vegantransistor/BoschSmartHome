@@ -1,4 +1,5 @@
-# code for the EM-FI loop control
+# c code for the EM-FI control loop
+
 * Control of the RIGOL signal generator
 * Control of the Bus Pirate for Reset generation
 * Test of JTAG via Segger J-LINK
