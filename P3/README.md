@@ -55,11 +55,11 @@ Here are some information about the upper communication layers I was able to fou
 
 Back to our fuzzer: just generating random packets won't work. A good starting point is to use some packets or packet sequences already recorded and manipulate them so that corner cases are generated. Fuzzing is successful if we detect malfunction / crash of the device. Let's record three different valid "sesame-open-the-shutters" commands from the SmartHome controller (hexadecimal values, CRC is omitted, packets are de-scrambled):
 
-> *19* 10 00 8E   4C 57 F4   53 D4 01   00 CF 67 74   CE 9F BB 19   54 75 85 10 48 DB C8 FD
+> *19* 10 00 8E   **4C 57 F4**   53 D4 01   **00 CF 67 74**   CE 9F BB 19   **54 75 85 10 48 DB C8 FD**
 
-> *19* 10 00 8E   4C 57 F4   53 D4 01   00 CF 67 77   1D 9C 10 2B   94 72 5C BD 87 BB 91 1A
+> *19* 10 00 8E   **4C 57 F4**   53 D4 01   **00 CF 67 77**   1D 9C 10 2B   **94 72 5C BD 87 BB 91 1A**
 
-> *19* 10 00 8E   4C 57 F4   53 D4 01   00 CF 67 7C   F7 5C 0E 79   03 E3 4B 64 32 AF 89 B9
+> *19* 10 00 8E   **4C 57 F4**   53 D4 01   **00 CF 67 7C**   F7 5C 0E 79   **03 E3 4B 64 32 AF 89 B9**
 
 Here is the description of the different fields:
 
@@ -70,10 +70,10 @@ Here is the description of the different fields:
 | 4..6        | source address|
 | 7..9        | destination address|
 | 10..13      | replay counter|
-| 14..17      | encrypted MAC (authentication code)|
+| 14..17      | encrypted MAC|
 | 18..25      | encrypted payload|
 
-If we try to replay one of these packets with our smart-home-fuzzer, we get an ACK packet (06 4C 57 F4 53 D4 01) but nothing happens -replay protection works. The device only reacts (i.e. acknowledges) if the destination address is correct. However, the addresses can be easily eavesdropped over the RF channel.
+If we try to replay one of these packets with our smart-home-fuzzer, we get an ACK packet (*06 4C 57 F4 53 D4 01*) but nothing happens - replay protection works. The device only reacts (i.e. acknowledges) if the destination address is correct. However, the addresses can be easily eavesdropped over the RF channel.
 
 ## The ping of death
 
@@ -90,7 +90,7 @@ In order to generate these packets, only public information is needed (only the 
 ## What could go wrong?
 
 I guess that the RX packet parser does not check for a minimal packet length when receiving non-ACK packets. It calculates the encrypted payload length (without CMAC) and – in case of the shortened packets described above – a negative number comes as a result. This negative number is then interpreted as “unsigned integer” by the device: for example -2 is interpreted as 254 assuming a one-byte encoding. This length is longer that the allocated memory length (the maximum packet size is about 61 bytes). As a consequence, SRAM memory corruption happens, which may (and does in most cases) lead to a crash.
-For the sake of explanation, here is a simple c code sequence (fictive numbers):
+For the sake of explanation, here is a simple C code sequence:
 
 ```
 #define RX_BUFFER_MAX_LENGTH 61
@@ -110,7 +110,7 @@ void message_decrpytion() {
 }
 ```
 
-A good hacker would say "Nice, that's the first step, let's go for Remote Code Execution". But since the payload is encrypted with an (attacker) unknown key, it is most probably impossible. However, we can try to extend the attack a bit.
+A good hacker would say "Nice, that's the first step, let's go for Remote Code Execution". But since the payload is encrypted with an (attacker) unknown key, it is most probably impossible (never say that). However, we can try to extend the attack a bit.
 
 ## The Universal Ping of Death
 
@@ -125,7 +125,9 @@ In many protocols some broadcast / multicast addresses are defined, and this is 
 Note that depending of the value of the last byte (first counter byte, involved as input in AES computations and therefore defining the corrupted content) the effect may be different. I tried it successfully on 2 different devices (Rolladensteuerung and Zwischenstecker). To build this universal message, no prior information about the device is needed (key, address…). Each device listening to this message will most probably crash. 
 
 ## Exploitation
+
 Using higher Transmission (TX) power (the original device uses about 10 mW / 10 dBm transmission power, transmitters / Power Amplifiers (PA) with up to a few W are available and cheap in this band) and/or a better antenna (again: cheap equipment in this ISM band), the range of the transmitter can be heavily extended to several kilometers or tens of kilometers so that a wide area can be affected.
 
 ## Conclusion
+
 In this post we saw how to reverse engineer parts of a proprietary communication link of a smart home device and build a simple "fuzzer" device in order to find implementation bugs, which can be used to perform a spectacular DoS attack. We exploited two vulnerabilities: a buffer overflow and a protocol vulnerability (processing packets with broadcast destination address and regardless of source address) to build a universal ping of death message valid for many devices accessible over a radio channel without prior knowledge.
