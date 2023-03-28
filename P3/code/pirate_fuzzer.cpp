@@ -6,8 +6,10 @@
 #include <time.h>
 #include <stdlib.h>
 
+// number of trials
 #define NBTRY 1
 
+// Experimental stuff for smoke detector working on another freuqnecy
 //#define LONG_PREAMB
 //#define PREAMB_T 1200
 //#define F869_5 // default is 868,0MHz
@@ -16,18 +18,21 @@
 #define SNIFFER
 //#define TXM_REPLAY
 
+// enables RX and/or TX
 #define RXAPP
 #ifndef SNIFFER
 #define TXAPP
 #endif
 
+// if true random is needed, otherwise deterministic start
 //#define TRUERANDOM
 #define RAND_N 0
 
+// enables scrambling and descrambling functions
 #define DESCRAMBLING
 #define SCRAMBLING
 
-//#define TIMEOUT_TX .05
+// timeouts
 #define TIMEOUT_TX 1.1
 
 #ifndef SNIFFER
@@ -45,10 +50,13 @@
 //#define TX_VERBOSE
 #define RX_VERBOSE
 
+// add some sleep time
 //#define SLEEP_BETWEEN_TR
 #define SLEEP_BT 5
 
+// write some log in file
 #define WRITE_LOG
+
 
 #define TXM_MAX 63
 unsigned char TXM[TXM_MAX];
@@ -106,6 +114,7 @@ unsigned char PIRATE_TRX_TX[PIRATE_TRX_TX_L] = {
 	0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00
 };
 
+// specific scrambling function for the smart home device
 int packet_scrambling(unsigned char * packet, unsigned int l)
 {
 	unsigned int i;
@@ -119,6 +128,7 @@ int packet_scrambling(unsigned char * packet, unsigned int l)
 			packet[i] = packet[i] ^ ((packet[i-1] + 0xDC) & 0xFF);
 }
 
+// specific descrambling function for the smart home device
 int packet_descrambling(unsigned char * packet, unsigned int l)
 {
 	unsigned int i;
@@ -140,7 +150,7 @@ int packet_descrambling(unsigned char * packet, unsigned int l)
 	packet[l - 1] = packet[l - 1] ^ packet[2];
 }
 
-
+// read log
 unsigned int read_log()
 {
 	unsigned int i = 1;
@@ -154,6 +164,7 @@ unsigned int read_log()
 	return c-1;
 }
 
+// read TXM file
 unsigned int read_txm()
 {
 	unsigned int i = 1;
@@ -186,7 +197,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	srand(time(NULL));
 #endif
 
-	unsigned char r = rand() % 256;      // Returns a pseudo-random integer between 0 and RAND_MAX.
+	unsigned char r = rand() % 256;      
 	printf("\nINIT RNG = %02X\n", r);
 
 	// init random
