@@ -6,24 +6,35 @@
 #include "pirate_driver.h"
 #include "windows.h"
 
-
+// halt if JTAG is open
 #define HALT_ON_BINGO
+
+// number of trials per delay
 #define TRY_PER_DEL 5
+
+// comment if no target is present
 #define TARGET 
 
+// comment if no bus pirate is present
 #define BUSPIRATE
 
+// infinite loop
 #define INFINITE
 
 // DELAY in ns
 // Warning: Pulse gen reacts to FALLING EDGE, so substract pulse width 10000 ns
+
 //#define INIT_DELAY 169000
 #define INIT_DELAY 180000
 #define DELAY_DELTA 10
 //#define END_DELAY 174000
 #define END_DELAY 183000
 
-FILE * F1, *F2;
+FILE * F1;
+
+
+// this function checks the JTAG connection by reading the jlink log file and test some strings. Shall be adapted.
+// returns 0  if JTAG is accessible, -1 otherwise
 
 int check_connection()
 {
@@ -69,6 +80,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	unsigned int i,r;
 	unsigned int trial, delay;
 
+	// RIGOL generator sometimes do not apply configuration correctly, check before launching!
 	printf("!!! WARNING! CHECK IF PULSE NEG IS 0V !!!\n");
 	getchar();
 
