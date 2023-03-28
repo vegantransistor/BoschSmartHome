@@ -118,7 +118,7 @@ void message_decrpytion() {
 }
 ```
 
-A good hacker would say "Nice, that's the first step, let's go for Remote Code Execution". But since the payload is encrypted with an (attacker) unknown key, it is most probably impossible (never say that). However, we can try to extend the attack a bit.
+A good hacker would say "Nice, that's the first step, let's go for Remote Code Execution". But since the payload is not under attacker control, it is most probably impossible (never say that). However, we can try to extend the attack a bit.
 
 ## The Universal Ping of Death
 
