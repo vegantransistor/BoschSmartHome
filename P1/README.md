@@ -97,7 +97,7 @@ We have a console:
 
 **If you want to reproduce this, do the following:**
 
-* Solder a micro-SD Card adapter to following test points of the board:
+* Solder a micro-SD Card adapter to following test points on the board backside:
 
 ![sd](./pictures/sd.png)
 
