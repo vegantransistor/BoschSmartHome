@@ -4,7 +4,7 @@ In this post, we will perform an Electromagnetic Fault Injection (EM-FI) on a mi
 
 Note that the vulnerability described here has already been [disclosed 2021 by "limited results"](https://limitedresults.com/2021/06/enter-the-efm32-gecko/) and an advisory has been published.
 
-After opening a Bosch Smart Home device (the ["Rolladensteuerung I"), we find two PCBs with following components:
+After opening a Bosch Smart Home device (the "Rolladensteuerung I"), we find two PCBs with following components:
 
 ![p1](./pictures/p1.png)
 
