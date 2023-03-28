@@ -8,3 +8,5 @@ Main application in "pirate_emfi.cpp"
 
 Put your Bus Pirate COM number in "pirate_driver.cpp"
 > #define COM 7
+
+Compiled on Windows.
