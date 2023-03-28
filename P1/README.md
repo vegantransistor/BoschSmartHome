@@ -101,13 +101,13 @@ We have a console:
 
 ![sd](./pictures/sd.png)
 
-* In the [boot](./boot/) directory, you will find the modified MLO (MLO) and the u-boot binary with modified bootdelay (app). Copy these files (without renaming them) on a micro-SD card formatted with FAT32 or FAT16 in the root directory
+* In the [boot](./boot/) directory, you will find the modified "magic" MLO (MLO) with the stack corruption hack and the u-boot binary with modified bootdelay (app). Copy these files (without renaming them) on a micro-SD card formatted with FAT32 or FAT16, in the root directory
 
-* To force the microprocessor to boot with the second MMC interface, we need to disturb the primary interface connected to the internal MMC IC. For that we can e.g. ground the clock line, use this test point:
+* To force the microprocessor to boot with the second MMC interface (the one connected to the test points), we need to disturb the primary interface connected to the internal MMC IC. For that we can e.g. ground the clock line, use this test point:
 
 ![sdc](./pictures/sdc.png)
 
-* Ground the clock, put the micro-SD card in the adapter connected to the test points and power on the device. First the LEDs will blink crazy, wait until u-boot starts and you see **Enter 'noautoboot' to enter prompt without timeout**. You have 5 seconds to type **noautoboot** and then a u-boot console starts!
+* Ground the clock, put the micro-SD card in the adapter connected to the test points and power on the device. First the LEDs will blink crazy, wait until u-boot starts and you see **Enter 'noautoboot' to enter prompt without timeout**. You have 5 seconds to type **noautoboot** and then a u-boot console starts. You hacked secure boot.
 
 Having done that, our next goal is to change the Linux root password in the device in order to "be root" without manipulating the hardware. First we search the dumped flash content for the typical root password hash format. Replacing it on place with an own root password hash (generated with openssl passwd) was possible with the uBoot console using the mmc commands *mmc write*.
 
