@@ -74,8 +74,8 @@ We can place a valid return address at a specific place of the increased ISW and
 Normally, the next step would be to reverse engineer the MLO/SPL binary, find the secure boot branch and patch it. I tried to patch the bootloader with Ghidra but nothing happened. In fact, the eMMC interface is somehow broken after corrupting the normal program sequence, so that loading u-boot does not work. That's why I wrote my own bootloader with [TI Code Composer Studio](https://www.ti.com/tool/CCSTUDIO), re-initializing everything correctly.
 In order to run this bootloader easily without desoldering and resoldering the eMMC Flash, I used a feature of the boot process: at boot time, the processor looks for valid data in different devices in the so called boot sequence. This boot sequence can be customized with some pins, here is the boot sequence used in the Bosch SmartHome Controller:
 
-1. MMC0 Interface (internal MMC device)
-2. MMC1 Interface (connected to test points)
+1. MMC1 Interface (internal MMC device)
+2. MMC0 Interface (connected to test points)
 3. UART0 Interface
 4. USB0 Interface
 
@@ -108,6 +108,8 @@ We have a console:
 ![sdc](./pictures/sdc.png)
 
 * Ground the clock, put the micro-SD card in the adapter connected to the test points and power on the device. First the LEDs will blink crazy, wait until u-boot starts and you see **Enter 'noautoboot' to enter prompt without timeout**. You have 5 seconds to type **noautoboot** and then a u-boot console starts. You hacked secure boot.
+
+Note: use short cables.
 
 Having done that, our next goal is to change the Linux root password in the device in order to "be root" without manipulating the hardware. First we search the dumped flash content for the typical root password hash format. Replacing it on place with an own root password hash (generated with openssl passwd) was possible with the uBoot console using the mmc commands *mmc write*.
 
