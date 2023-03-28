@@ -95,14 +95,16 @@ We have a console:
 
 ![uboot](./pictures/uboot.png)
 
-If you want to reproduce this, do the following:
+**If you want to reproduce this, do the following:**
 
 * Solder a micro-SD Card adapter to following test points of the board:
+* 
 ![sd](./pictures/sd.png)
 
 * In the [boot](./boot/) directory, you will find the modified MLO (MLO) and the u-boot binary with modified bootdelay (app). Copy these files (without renaming them) on a micro-SD card formatted with FAT32 or FAT16 in the root directory
 
 * To force the microprocessor to boot with the second MMC interface, we need to disturb the primary interface connected to the internal MMC IC. For that we can e.g. ground the clock line, use this test point:
+* 
 ![sdc](./pictures/sdc.png)
 
 * Ground the clock, put the micro-SD card in the adapter connected to the test points and power on the device. First the LEDs will blink crazy, wait until u-boot starts and you see **Enter 'noautoboot' to enter prompt without timeout**. You have 5 seconds to type **noautoboot** and then a u-boot console starts!
