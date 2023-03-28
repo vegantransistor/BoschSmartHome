@@ -4,7 +4,7 @@ During Christmas holidays 2019 I had a lot of time and I decided to have a look 
 
 ![SHC1](./pictures/shc1.png)
 
-At the heart of the device there is a TI processor with TI logo and the marking "SNI5065260BZCZ", a DDR3 SDRAM and an eMMC Flash IC. The first challenge was to find out which processor it is -research about the marking was not very successful:
+At the heart of the device there is a TI processor with TI logo and the marking "SNI5065260BZCZ", a DDR3 SDRAM and an eMMC Flash IC. The first challenge was to find out which processor it is - research about the marking was not very successful:
 
 ![TI](./pictures/ti.png)
 
