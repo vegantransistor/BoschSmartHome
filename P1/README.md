@@ -103,7 +103,7 @@ We have a console:
 
 * In the [boot](./boot/) directory, you will find the modified "magic" MLO (MLO) with the stack corruption hack and the u-boot binary with modified bootdelay (app). Copy these files (without renaming them) on a micro-SD card formatted with FAT32 or FAT16, in the root directory
 
-* To force the microprocessor to boot with the second MMC interface (the one connected to the test points), we need to disturb the primary interface connected to the internal MMC IC. For that we can e.g. ground the clock line, use this test point:
+* To force the microprocessor to boot with the second MMC interface (the one connected to the test points), we need to disturb the primary interface connected to the internal MMC IC. For that we can e.g. ground the clock line, use this test point (backside):
 
 ![sdc](./pictures/sdc.png)
 
