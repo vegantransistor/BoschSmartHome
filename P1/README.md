@@ -113,8 +113,8 @@ We can place a valid return address at a specific place of the increased ISW and
 
 **Summary: How does secure boot process is bypassed (guesses):**
 
-1. BootROM starts and loads TOC from eMMC in internal On Chip RAM (OCRAM). ROM code is immutable.
-2. BootROM checks signatures of TOC contents, including an application called PPA and runs it. PPA is part of the TOC. The Root Public Key is most probably located into Fuses in the device (there is no internal flash).
+1. BootROM starts and loads some initial code and parameters from eMMC in internal On Chip RAM (OCRAM). ROM code is immutable.
+2. BootROM checks signatures of the initial code and parameters. The Root Public Key is most probably located into Fuses in the device (there is no internal flash).
 3. BootROM loads the manipulated, too big Initial Software ISW in OCRAM, stack is corrupted.
 4. Normally, at this point the BootROM checks signature of ISW and runs ISW if the signature is valid - otherwise going in a secure lockdown state. In our case the PC is updated with an address pointing to our SW.
 5. Arbitrary code runs without check
@@ -157,7 +157,7 @@ We have a console:
 
 * Ground the clock, put the micro-SD card in the adapter connected to the test points and power on the device. First the LEDs will blink crazy, wait until u-boot starts and you see **Enter 'noautoboot' to enter prompt without timeout**. You have 5 seconds to type **noautoboot** and then a u-boot console starts. You hacked secure boot.
 
-Note: use short cables.
+Note: use short cables everywhere.
 
 Having done that, our next goal is to change the Linux root password in the device in order to "be root" without manipulating the hardware. First we search the dumped flash content for the typical root password hash format. Replacing it on place with an own root password hash (generated with openssl passwd) was possible with the uBoot console using the mmc commands *mmc write*.
 
@@ -173,4 +173,4 @@ In this post, I described how to root the Bosch SmartHome Controller I, exploiti
 
 **Disclosure**
 
-I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020.
+I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020. In Mai 2021 I got a clearance to publish.
