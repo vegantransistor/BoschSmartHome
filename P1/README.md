@@ -179,6 +179,7 @@ I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020. In 
 ## Acknowledgements
 
 Many thanks to Bosch Smart Home and Bosch PSIRT for their support, cooperation and feedback.
+
 Excellent review done by [stulle123](https://github.com/stulle123), thank you!
 
 ## Appendix
