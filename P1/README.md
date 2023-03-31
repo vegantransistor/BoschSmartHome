@@ -86,7 +86,7 @@ Everything went well and the firmware is not encrypted. There are 6 partitions, 
 
 > MMC/SD Cards or eMMC/ eSD devices may hold a FAT file system which ROM Code is able to read and process. The image used by the booting procedure is taken from a specific booting file named “MLO”. This file has to be located in the root directory on an active primary partition of type FAT12/16 or FAT32.
 
-Details about the MLO files are not publicly available :-( but let's see what we can learn about it. Having a look at the file with [HxD Hex Editor](https://mh-nexus.de/de/hxd/), we find different parts beginning with readable strings. The first part has the length 0x1400, which corresponds to the first 32 bit words (underlined red, note the endianness), this may be a length field used by the ROM code to load this amount of data. The second word (underlined yellow) corresponds to the length of the Initial Software (0x9810):
+Details about the MLO files are not publicly available :raised_eyebrow: but let's see what we can learn about it. Having a look at the file with [HxD Hex Editor](https://mh-nexus.de/de/hxd/), we find different parts beginning with readable strings. The first part has the length 0x1400, which corresponds to the first 32 bit words (underlined red, note the endianness), this may be a length field used by the ROM code to load this amount of data. The second word (underlined yellow) corresponds to the length of the Initial Software (0x9810):
 
 ![mlo](./pictures/mlo.png)
 
@@ -109,17 +109,17 @@ The [user manual](https://www.ti.com/lit/ug/spruh73q/spruh73q.pdf) gives us some
 
 The BootROM needs a stack in OCRAM located at 0x4030B800 and in the same time the image is loaded in OCRAM at address 0x403000000. *It will be apparent to those skills in the art* that a stack corruption can happen if too many data are loaded. And this is exactly what happens when we increase the size of the ISW part to an "illegal" value. 
 
-We can place a valid return address at a specific place of the increased ISW and the program pointer is then loaded with this address at the next function call return (something like "pop pc"). So we can place our own code at some place in the ISW part, putting the magic address and our code is executed… BEFOREthe signature is checked! This means: secure boot is probably broken.
+We can place a valid return address at a specific place of the increased ISW and the program pointer is then loaded with this address at the next function call return (something like "pop pc"). So we can place our own code at some place in the ISW part, putting the magic address and our code is executed… BEFORE the signature is checked! This means: secure boot is probably broken.
 
 **Summary: How does secure boot process is bypassed (guesses):**
 
 1. BootROM starts and loads TOC from eMMC in internal On Chip RAM (OCRAM). ROM code is immutable.
 2. BootROM checks signatures of TOC contents, including an application called PPA and runs it. PPA is part of the TOC. The Root Public Key is most probably located into Fuses in the device (there is no internal flash).
 3. BootROM loads the manipulated, too big Initial Software ISW in OCRAM, stack is corrupted.
-4. Normally, at this point the BootROM checks signature of ISW and runs ISW if the signature is valid -otherwise going in a secure lockdown state. In our case the PC is updated with an address pointing to our SW.
-5. Our code runs without check
+4. Normally, at this point the BootROM checks signature of ISW and runs ISW if the signature is valid - otherwise going in a secure lockdown state. In our case the PC is updated with an address pointing to our SW.
+5. Arbitrary code runs without check
 
-Normally, the next step would be to reverse engineer the MLO/SPL binary, find the secure boot branch and patch it. I tried to patch the bootloader with Ghidra but nothing happened. In fact, the eMMC interface is somehow broken after corrupting the normal program sequence, so that loading u-boot does not work. That's why I wrote my own bootloader with [TI Code Composer Studio](https://www.ti.com/tool/CCSTUDIO), re-initializing everything correctly.
+This said, we need a bootloader binary to load and run u-boot. The simplest way to get one is to patch the original one i.e. find the secure boot branch and patch it. I tried to patch the bootloader with Ghidra and run it but nothing happened. In fact, the eMMC interface is somehow broken after corrupting the normal program sequence, so that loading u-boot does not work. That's why I wrote my own bootloader with [TI Code Composer Studio](https://www.ti.com/tool/CCSTUDIO), re-initializing everything correctly.
 In order to run this bootloader easily without desoldering and resoldering the eMMC Flash, I used a feature of the boot process: at boot time, the processor looks for valid data in different devices in the so called boot sequence. This boot sequence can be customized with some pins, here is the boot sequence used in the Bosch SmartHome Controller:
 
 1. MMC1 Interface (internal MMC device)
