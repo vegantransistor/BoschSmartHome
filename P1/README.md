@@ -192,7 +192,7 @@ This is what you can do to boot the Bosch Smarthome Controller 1 with your own b
 
 * Next, ground the clock, put the micro-SD card into the adapter connected to the test points and power on the device. First, the LEDs will blink crazily, just wait until U-Boot starts and you will see the message `Enter 'noautoboot' to enter prompt without timeout`. You have five seconds to type `noautoboot` and then you have a U-Boot shell.
 
-Please Note: use short cables everywhere ;-)
+Note: use short cables everywhere 
 
 
 
