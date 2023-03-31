@@ -21,7 +21,50 @@ The next step was to "sniff" the primary UART communication (UART0) which normal
 
 And this is what came out:
 
-![shcboot](./pictures/shcboot.png)
+```
+U-Boot SPL 2013.01.01_1.6.7-g71cce35 (2015-12-08 - 16:13:03)
+SHC
+MPU reference clock runs at 6 MHz
+Setting MPU clock to 594 MHz
+Enabling Spread Spectrum of 18 permille for MPU
+OMAP SD/MMC: 0 @ 26 MHz, OMAP SD/MMC: 1 @ 26 MHz
+Booting from eMMC!
+reading u-boot.img
+reading u-boot.img
+## Verifying secure image at 807fffc0 ... OK
+
+
+U-Boot 2013.01.01_1.6.7-g71cce35 (2015-12-08 - 16:13:03)
+
+I2C:   ready
+DRAM:  512 MiB
+Enabling the D-Cache
+MMC:   OMAP SD/MMC: 0 @ 26 MHz, OMAP SD/MMC: 1 @ 26 MHz
+Net:   cpsw
+mmc1(part 0) is current device
+eMMC detected on device 1
+## Error: "emmc_erase" not defined
+Active root is partition 5 (root1)
+7338536 bytes read in 510 ms (13.7 MiB/s)
+Booting Linux from eMMC ...
+32204 bytes read in 27 ms (1.1 MiB/s)
+device tree detected
+## Verifying secure image at 84000000 ... OK
+## Booting kernel from Legacy Image at 84000000 ...
+   Image Name:   Linux-4.4.258-shc
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    7338192 Bytes = 7 MiB
+   Load Address: 80008000
+   Entry Point:  80008000
+## Verifying secure FDT image at 85000000 ... OK
+## Flattened Device Tree blob at 85000000
+   Booting using the fdt blob at 0x85000000
+   Loading Kernel Image ... OK
+OK
+   Using Device Tree in place at 85000000, end 8500acb3
+
+Starting kernel ...
+```
 
 We see that Linux is implemented with uBoot SPL and uBoot as bootloaders. We also see that secure boot is in place ("Verifying secure image"), so that only signed firmware can (shall) be executed. I did not found the UART *RX* Interface at first, needed to transfer data from the PC to the device. In fact, after desoldering the processor I found out that it was not connected / wired at all!
 Here is the location of the RX pin:
