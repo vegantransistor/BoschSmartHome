@@ -119,24 +119,15 @@ Now we can place a valid return address at a specific place of our modified ISW 
 
 This was my initial assumption on how we could possibly bypass Secure Boot on the Bosch SmartHome Controller I:
 
-1. BootROM starts and loads TOC from eMMC into internal On Chip RAM (OCRAM). The ROM code is immutable.
-2. BootROM checks signatures of TOC contents, including an application called PPA and runs it. PPA is part of the TOC. The Root Public Key is most probably burned into fuses as there's no internal flash.
-3. BootROM loads our malicious Initial Software (ISW) image into OCRAM to overflow the OCRAM's public stack.
-4. At this point the BootROM verifies the signature of the ISW and executes it if the signature is valid. Otherwise, the controller switches into a secure lockdown state. Next, we can overwrite the return address with our own address to let the Program Counter point to our own malicious payload.
-5. Code execution 🥳
-
-Next, I anticipated to just reverse engineer the MLO/SPL binary to find the Secure Boot branch and patch it out. However, I tried to patch the bootloader with Ghidra but with no luck. In fact, the eMMC interface was somehow broken after corrupting the normal boot sequence, resulting U-Boot in getting stuck. That's why I wrote my own bootloader with [TI Code Composer Studio](https://www.ti.com/tool/CCSTUDIO) to re-initialize everything correctly.
-
-In order to run my new bootloader easily without desoldering and resoldering the eMMC Flash, I just changed the boot sequence of the Bosch SmartHome Controller. This is the device's boot order:
-=======
 1. BootROM starts and loads some initial code and parameters from eMMC in internal On Chip RAM (OCRAM). ROM code is immutable.
 2. BootROM checks signatures of the initial code and parameters. The Root Public Key is most probably located into Fuses in the device (there is no internal flash).
 3. BootROM loads the manipulated, too big Initial Software ISW in OCRAM, stack is corrupted.
 4. Normally, at this point the BootROM checks signature of ISW and runs ISW if the signature is valid - otherwise going in a secure lockdown state. In our case the PC is updated with an address pointing to our SW.
-5. Arbitrary code runs without check
+5. Code execution 🥳
 
-This said, we need a bootloader binary to load and run u-boot. The simplest way to get one is to patch the original one i.e. find the secure boot branch and patch it. I tried to patch the bootloader with Ghidra and run it but nothing happened. In fact, the eMMC interface is somehow broken after corrupting the normal program sequence, so that loading u-boot does not work. That's why I wrote my own bootloader with [TI Code Composer Studio](https://www.ti.com/tool/CCSTUDIO), re-initializing everything correctly.
-In order to run this bootloader easily without desoldering and resoldering the eMMC Flash, I used a feature of the boot process: at boot time, the processor looks for valid data in different devices in the so called boot sequence. This boot sequence can be customized with some pins, here is the boot sequence used in the Bosch SmartHome Controller:
+This said, we need a bootloader binary to load and run u-boot. The simplest way to get one is to patch the original one i.e. find the secure boot branch and patch it. I tried to patch the bootloader with Ghidra and run it but nothing happened. In fact, the eMMC interface is somehow broken after corrupting the normal program sequence, so that loading u-boot does not work. That's why I wrote my own bootloader with [TI Code Composer Studio](https://www.ti.com/tool/CCSTUDIO) to re-initialize everything correctly.
+
+In order to run my new bootloader easily without desoldering and resoldering the eMMC Flash, I just changed the boot sequence of the Bosch SmartHome Controller. This is the device's boot order:
 
 1. MMC1 interface
 2. MMC0 interface
@@ -151,7 +142,7 @@ At boot time, we can skip the MMC1 interface by grounding the clock so that the 
 
 ![boot](./pictures/boot.png)
 
-As you can see in the picture above, we were able to run our first small application **without having a RSA signature**. 
+As you can see in the picture above, we were able to run our first small application **without having a valid RSA signature**. 
 
 ## Getting a U-Boot shell
 
@@ -183,7 +174,7 @@ In this post, I described how to root the Bosch SmartHome Controller I by exploi
 
 ## Responsible Disclosure
 
-I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020.
+I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020. In Mai 2021 I got a clearance to publish.
 
 ## Appendix
 
@@ -201,7 +192,7 @@ This is what you can do to boot the Bosch Smarthome Controller 1 with your own b
 
 * Next, ground the clock, put the micro-SD card into the adapter connected to the test points and power on the device. First, the LEDs will blink crazily, just wait until U-Boot starts and you will see the message `Enter 'noautoboot' to enter prompt without timeout`. You have five seconds to type `noautoboot` and then you have a U-Boot shell.
 
-Please Note: use short cables ;-)
+Please Note: use short cables everywhere ;-)
 
-I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020. In Mai 2021 I got a clearance to publish.
+
 
