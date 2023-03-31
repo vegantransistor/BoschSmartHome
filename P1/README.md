@@ -25,7 +25,50 @@ The next step was to "sniff" the primary UART communication `UART0` which normal
 
 And this is what came out:
 
-![shcboot](./pictures/shcboot.png)
+```
+U-Boot SPL 2013.01.01_1.6.7-g71cce35 (2015-12-08 - 16:13:03)
+SHC
+MPU reference clock runs at 6 MHz
+Setting MPU clock to 594 MHz
+Enabling Spread Spectrum of 18 permille for MPU
+OMAP SD/MMC: 0 @ 26 MHz, OMAP SD/MMC: 1 @ 26 MHz
+Booting from eMMC!
+reading u-boot.img
+reading u-boot.img
+## Verifying secure image at 807fffc0 ... OK
+
+
+U-Boot 2013.01.01_1.6.7-g71cce35 (2015-12-08 - 16:13:03)
+
+I2C:   ready
+DRAM:  512 MiB
+Enabling the D-Cache
+MMC:   OMAP SD/MMC: 0 @ 26 MHz, OMAP SD/MMC: 1 @ 26 MHz
+Net:   cpsw
+mmc1(part 0) is current device
+eMMC detected on device 1
+## Error: "emmc_erase" not defined
+Active root is partition 5 (root1)
+7338536 bytes read in 510 ms (13.7 MiB/s)
+Booting Linux from eMMC ...
+32204 bytes read in 27 ms (1.1 MiB/s)
+device tree detected
+## Verifying secure image at 84000000 ... OK
+## Booting kernel from Legacy Image at 84000000 ...
+   Image Name:   Linux-4.4.258-shc
+   Image Type:   ARM Linux Kernel Image (uncompressed)
+   Data Size:    7338192 Bytes = 7 MiB
+   Load Address: 80008000
+   Entry Point:  80008000
+## Verifying secure FDT image at 85000000 ... OK
+## Flattened Device Tree blob at 85000000
+   Booting using the fdt blob at 0x85000000
+   Loading Kernel Image ... OK
+OK
+   Using Device Tree in place at 85000000, end 8500acb3
+
+Starting kernel ...
+```
 
 At the boot screen we see that Linux is implemented with uBoot SPL and uBoot as bootloaders. We also see that Secure Boot is in place which is shown by the message `Verifying secure image`, so that only signed firmware is allowed to run. At first, I did not found the UART `RX` interface which is needed to transfer data from the PC to the device. In fact, after desoldering the processor I found out that it was not connected / wired at all! Here is the location of the RX pin:
 
@@ -59,7 +102,12 @@ As we all know, manipulating length fields is one of the most important hacker s
 
 ## Overflowing the internal On Chip RAM (OCRAM)
 
-The [user manual](https://www.ti.com/lit/ug/spruh73q/spruh73q.pdf) gives us some information about the memory layout of the internal On Chip RAM (OCRAM) during the boot process:
+Here is a very simplified description of the first boot steps:
+1. ROM Bootloader starts, it uses the internal On-Chip RAM (OCRAM). SDRAM is not initialized.
+2. ROM Bootloader checks the Boot configuration and loads the user bootloader (MLO) from eMMC in internal OCRAM
+3. ROM Bootloader transfers control to the user bootloader code
+
+The [user manual](https://www.ti.com/lit/ug/spruh73q/spruh73q.pdf) gives us some information about the memory layout of the OCRAM during the boot process:
 
 ![stack](./pictures/stack.png)
 
@@ -80,6 +128,15 @@ This was my initial assumption on how we could possibly bypass Secure Boot on th
 Next, I anticipated to just reverse engineer the MLO/SPL binary to find the Secure Boot branch and patch it out. However, I tried to patch the bootloader with Ghidra but with no luck. In fact, the eMMC interface was somehow broken after corrupting the normal boot sequence, resulting U-Boot in getting stuck. That's why I wrote my own bootloader with [TI Code Composer Studio](https://www.ti.com/tool/CCSTUDIO) to re-initialize everything correctly.
 
 In order to run my new bootloader easily without desoldering and resoldering the eMMC Flash, I just changed the boot sequence of the Bosch SmartHome Controller. This is the device's boot order:
+=======
+1. BootROM starts and loads some initial code and parameters from eMMC in internal On Chip RAM (OCRAM). ROM code is immutable.
+2. BootROM checks signatures of the initial code and parameters. The Root Public Key is most probably located into Fuses in the device (there is no internal flash).
+3. BootROM loads the manipulated, too big Initial Software ISW in OCRAM, stack is corrupted.
+4. Normally, at this point the BootROM checks signature of ISW and runs ISW if the signature is valid - otherwise going in a secure lockdown state. In our case the PC is updated with an address pointing to our SW.
+5. Arbitrary code runs without check
+
+This said, we need a bootloader binary to load and run u-boot. The simplest way to get one is to patch the original one i.e. find the secure boot branch and patch it. I tried to patch the bootloader with Ghidra and run it but nothing happened. In fact, the eMMC interface is somehow broken after corrupting the normal program sequence, so that loading u-boot does not work. That's why I wrote my own bootloader with [TI Code Composer Studio](https://www.ti.com/tool/CCSTUDIO), re-initializing everything correctly.
+In order to run this bootloader easily without desoldering and resoldering the eMMC Flash, I used a feature of the boot process: at boot time, the processor looks for valid data in different devices in the so called boot sequence. This boot sequence can be customized with some pins, here is the boot sequence used in the Bosch SmartHome Controller:
 
 1. MMC1 interface
 2. MMC0 interface
@@ -145,3 +202,6 @@ This is what you can do to boot the Bosch Smarthome Controller 1 with your own b
 * Next, ground the clock, put the micro-SD card into the adapter connected to the test points and power on the device. First, the LEDs will blink crazily, just wait until U-Boot starts and you will see the message `Enter 'noautoboot' to enter prompt without timeout`. You have five seconds to type `noautoboot` and then you have a U-Boot shell.
 
 Please Note: use short cables ;-)
+
+I disclosed this vulnerability to TI PSIRT and Bosch PSIRT in February 2020. In Mai 2021 I got a clearance to publish.
+
