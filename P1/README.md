@@ -104,7 +104,7 @@ As we all know, manipulating length fields is one of the most important hacker s
 
 Here is a very simplified description of the first boot steps:
 1. ROM Bootloader starts, it uses the internal On-Chip RAM (OCRAM). SDRAM is not initialized.
-2. ROM Bootloader checks the Boot configuration and loads the user bootloader (MLO) from eMMC in internal OCRAM
+2. At some point, ROM Bootloader checks the Boot configuration and loads the user bootloader (MLO) from eMMC in internal OCRAM
 3. ROM Bootloader transfers control to the user bootloader code
 
 The [user manual](https://www.ti.com/lit/ug/spruh73q/spruh73q.pdf) gives us some information about the memory layout of the OCRAM during the boot process:
