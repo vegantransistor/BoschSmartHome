@@ -16,17 +16,17 @@ This nice device makes your shutters smart and is connected over a wireless inte
 
 > Funkfrequenz 868,3 MHz; 869,5 MHz
 
-There are tons of different wireless protocols used in this band and it happens that Bosch is using a "proprietary protocol", so reverse engineering work is needed here.
+There are tons of different wireless protocols used in this band and it happens that Bosch is using a "proprietary protocol" for this device, so reverse engineering work is needed here.
 
 Let's open the device and look for the RF module:
 
 ![p2](./pictures/p2.png)
 
-Here we see the transceiver module connected to the black quarter-lamda wire antenna. Note that for safety reasons, I bypassed the 230 V to 12 V power supply and supplied the device with 12 V directly (safety first !). In order to reverse engineer the physical layer we need information about the transceiver module. The heart of this module is a Texas Instrument (TI) Integrated Circuit (IC), the CC1101:
+Here we see the transceiver module connected to the black quarter-lamda wire antenna. Note that for safety reasons, I bypassed the 230 V to 12 V power supply and supplied the device with 12 V directly. In order to reverse engineer the physical layer we need information about the transceiver module. The heart of this module is a Texas Instrument (TI) Integrated Circuit (IC), the CC1101:
 
 ![p3](./pictures/p3.png)
 
-This IC needs to be configured with all radio and link parameters before usage after each power-up (no persistent memory). It is connected to the EFM32 microcontroller via a SPI interface. The next step is to sniff the SPI interface and record the parameters. To do that I used my picoscope with the serial decoding feature(one channel clk, one channel data and one channel chip select):
+This IC needs to be configured with all radio and link parameters before usage after each power-up (no persistent memory). It is connected to the EFM32 microcontroller via a SPI interface. The next step is to sniff the SPI interface and record the parameters. To do that I used my picoscope with the serial decoding feature (one channel clk, one channel data and one channel chip select):
 
 ![p4](./pictures/p4.png)
 
@@ -52,16 +52,16 @@ The CC1101 does not only handle the physical layer but also (part of) the link l
 
 ![p7](./pictures/p7.png)
 
-In our case, length field and CRC are used whereas address field is not used. From a security point of view this is important: for example, the CC1101 will automatically discard packets which are too long (maximum length can be configured) or with wrong CRC -a kind of first firewall. Note that the data are also scrambled before being sent but this is done by the EFM32 microcontroller.
+In our case, length field and CRC are used whereas address field is not used. From a security point of view this is important: for example, the CC1101 automatically discards packets which are too long (maximum length can be configured) or with wrong CRC - a kind of first firewall. Note that the data are also scrambled before being sent but this is done by the EFM32 microcontroller.
 
 The upper communication layers are handled by the embedded microcontroller, an EFM32G210F128 from Silicon Labs. This microcontroller is optimized for low power, has 128 kB Flash and 16 kB SRAM, and it uses execution-in-place (code can be executed from Flash directly). The device has an AES hardware accelerator (!) and a debugger protection ([vulnerable to EM-FI](./../P2/README.md)).
 
 Here are some information about the upper communication layers I was able to found out playing with the device:
-* Data scrambling is used (probably for better radio performance and maybe obfuscation - no crypto). It is implemented inside the EFM32 microcontroller. Packet scrambling and descrambling is also implemented in the fuzzer. Note that reverse engineering the scrambling algorithm (and more) involved firmware analysis (extracted in the last article) with Ghidra and on-chip debugging.
+* Data scrambling is used (probably for better radio performance). It is implemented inside the EFM32 microcontroller. Packet scrambling and descrambling is also implemented in the fuzzer. Note that reverse engineering the scrambling algorithm (and more) involved firmware analysis with Ghidra and on-chip debugging.
 * Most of the packets are protected against manipulation, eavesdropping and replay attacks. The device uses AES128-CCM described in the [RFC3610](https://www.rfc-editor.org/rfc/rfc3610). The device uses an individual initial key.
 * There are unencrypted small acknowledge (ACK) packets (similar to ZigBee).
 
-Back to our fuzzer: just generating random packets won't work. A good starting point is to use some packets or packet sequences already recorded and manipulate them so that corner cases are generated. Fuzzing is successful if we detect malfunction / crash of the device. Let's record three different valid "sesame-open-the-shutters" commands from the SmartHome controller (hexadecimal values, CRC is omitted, packets are de-scrambled):
+Back to the fuzzer: just generating random packets won't work. A good starting point is to use some packets or packet sequences already recorded and manipulate them so that corner cases are generated. Fuzzing is successful if we detect malfunction / crash of the device. Let's first record three different valid "sesame-open-the-shutters" commands from the SmartHome controller (hexadecimal values, CRC is omitted, packets are de-scrambled):
 
 > *19* 10 00 8E   **4C 57 F4**   53 D4 01   **00 CF 67 74**   CE 9F BB 19   **54 75 85 10 48 DB C8 FD**
 
@@ -85,7 +85,7 @@ If we try to replay one of these packets with our smart-home-fuzzer, we get an A
 
 ## The ping of death
 
-It happened that for some **shortened packets** a device crash occurs when the following packet is sent to the device: a shortened packet with a valid destination address, a length between 11 and 17 bytes, valid counter and random encrypted payload. The device does not react at the next valid command from the Smart Home Controller - until the next Power On Reset.
+It happened that for some **shortened packets** a device crash occurs when the following content is sent to the device: a shortened packet with a valid destination address, a length between 11 and 17 bytes, valid counter and random payload. The device does not react at the next valid command from the Smart Home Controller - until the next Power On Reset.
 
 ![p8](./pictures/p8.png)
 
@@ -95,9 +95,9 @@ This is an example of such a ping of death packet (note that the source address 
 
 In order to generate these packets, only public information is needed (only the 24 bit destination address field, broadcasted every few minutes) - no secret key. It induces a device crash - in security words a Denial of Service (DoS) attack.
 
-## What could go wrong?
+## What happens?
 
-I guess that the RX packet parser does not check for a minimal packet length when receiving non-ACK packets. It calculates the encrypted payload length (without CMAC) and – in case of the shortened packets described above – a negative number comes as a result. This negative number is then interpreted as “unsigned integer” by the device: for example -2 is interpreted as 254 assuming a one-byte encoding. This length is longer that the allocated memory length (the maximum packet size is about 61 bytes). As a consequence, SRAM memory corruption happens, which may (and does in most cases) lead to a crash.
+I guess that the RX packet parser does not check for a minimal packet length when receiving non-ACK packets. It calculates the encrypted payload length (without CMAC) and – in case of the shortened packets described above – a negative number comes as a result. This negative number is then interpreted as “unsigned integer” by the device: for example `-2` is interpreted as `254` assuming a one-byte encoding. This length is longer that the allocated memory length (the maximum packet size is about 61 bytes). As a consequence, SRAM memory corruption happens, which may (and does in most cases) lead to a crash.
 For the sake of explanation, here is a simple C code sequence:
 
 ```
@@ -138,4 +138,4 @@ Using higher Transmission (TX) power (the original device uses about 10 mW / 10 
 
 ## Conclusion
 
-In this post we saw how to reverse engineer parts of a proprietary communication link of a smart home device and build a simple "fuzzer" device in order to find implementation bugs, which can be used to perform a spectacular DoS attack. We exploited two vulnerabilities: a buffer overflow and a protocol vulnerability (processing packets with broadcast destination address and regardless of source address) to build a universal ping of death message valid for many devices accessible over a radio channel without prior knowledge.
+In this post we saw how to reverse engineer parts of a proprietary communication link of a smart home device and build a simple "fuzzer" device in order to find implementation bugs, which can be used to perform a DoS attack. We exploited two vulnerabilities: a buffer overflow and a protocol vulnerability (processing packets with broadcast destination address and regardless of source address) to build a universal ping of death message valid for many devices accessible over a radio channel without prior knowledge.
