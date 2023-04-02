@@ -1,6 +1,6 @@
 # Set up a Man in the Middle Proxy to sniff TLS traffic
 
-In this article you will learn how to set up a Man-in-the-Middle proxy between the Bosch Smart Home Controller and the Internet. Note that only outgoing connections (device is client) can be sniffed with this method; This covers almost all the cloud connections. Connections between APP and device in the same LAN won't be shown.
+In this article you will learn how to set up a Man-in-the-Middle proxy between the Bosch Smart Home Controller and the Internet. Note that only outgoing connections (device is client) can be sniffed with this method; This covers almost all the cloud connections. Connections between APP and device in the same LAN are out of scope.
 
 **Precondition:** [root your controller](https://github.com/vegantransistor/BoschSmartHome/blob/main/P1/README.md)
 
