@@ -51,19 +51,19 @@ Install [mitmproxy](https://mitmproxy.org/) and check the mitm root CA in `~/.mi
 
 ## Replace the Root Certificates in the device
 
-In order to extract TLS traffic we need to replace the root certificates in the device with the mitm root CA. Some of them are located in `/data/etc/certificates/truststore/` and this directore is not protected by dm-veritiy. Replace all certificates with the mitm root CA certificate. 
+In order to be able to catch the TLS traffic we need to replace the root certificates in the device with the mitm root CA. Some (most) of them are located in `/data/etc/certificates/truststore/` and this directore is not protected by dm-veritiy. Replace all certificates with the mitm root CA certificate. 
 
 For the java keystore file, you can add the mitm root CA certificate to the truststore with `keytool` (the password is `key4SH`):
 ```
-keytool -importcert -keystore bosch-smarthome.jks -file mitmproxy-ca-cert.cer
+keytool -importcert -keystore bosch-smarthome.jks -file mitmproxy-ca-cert.cer -alias mitm
 ```
 
 ## Extract the device certificate
-Each Controller has an own certificate, we will need it (and its associated key) for our mitmproxy. Go to `/etc/data/ecm/keys/` and copy `device_chain.pem` and `device_key_pair.pem`. Concatenate both files into one called `device_key_chain.pem`.
+Each Controller has an own certificate, we need it (and its associated private key) for the proxy connection. Go to `/etc/data/ecm/keys/` and copy `device_chain.pem` and `device_key_pair.pem`. Concatenate both files into one called `device_key_chain.pem`.
 
 ## Start mitmproxy
 
-On the PC, start mitmproxy. First restart dnsmasq and setup iptables:
+On the PC, start mitmproxy. First restart dnsmasq and setup ip forwarding and ip tables:
 ```
 sudo systemctl restart dnsmasq
 sudo sysctl -w net.ipv4.ip_forward=1
@@ -82,8 +82,9 @@ Then start the proxy:
 mitmproxy --rawtcp --set websocket=false --mode transparent --ssl-insecure --set confdir=[your path for mitm root CA] --set tls_version_client_max=TLS1_2 --set tls_version_server_max=TLS1_2 --set client_certs=[your path for device certificate]/device_key_chain.pem
 ```
 
-Normally you shall see the traffic in the mitmproxy application - most of the http requests shall be answered with `200`.
-Note that if you export the environmental variable `sslkeyfile` and import it in wireshark (Edit > Preferences > Protocols > TLS > Pre-Master secret log file name) you can also see the decrypted traffic in wireshark.
+Normally you shall see the (decrypted) traffic in the mitmproxy application and most of the http requests shall be answered with `200`.
+
+Note that if you export the environmental variable `sslkeyfile` and import it in wireshark (Edit > Preferences > Protocols > TLS > Pre-Master secret log file name), the decrypted traffic is available in wireshark too.
 
 
 
