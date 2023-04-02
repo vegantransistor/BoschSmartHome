@@ -8,6 +8,6 @@ In this repo you will find some nice hacks on the Bosch Smart Home devices. Enjo
 
 [Part 3: The Universal Smart Home Ping of Death](./P3/README.md)
 
-[Part 4: Set up a Man in The Middle proxy to read TLS traffic](./P4/README.md)
+[Part 4: Set up a Man in the Middle proxy to sniff TLS traffic](./P4/README.md)
 
 More to come...
