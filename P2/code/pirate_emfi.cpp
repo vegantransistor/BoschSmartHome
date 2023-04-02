@@ -30,6 +30,10 @@
 //#define END_DELAY 174000
 #define END_DELAY 183000
 
+#define JTAG_LOG_LINE_NUMBER 41
+#define JTAG_LOG_NB_OF_CHARACTERS 13
+#define JTAG_LOG_MAX_NB_OF_CHARACTERS 1000
+
 FILE * F1;
 
 
@@ -38,9 +42,9 @@ FILE * F1;
 
 int check_connection()
 {
-	char tc[1000];
+	char tc[JTAG_LOG_MAX_NB_OF_CHARACTERS];
 	unsigned int r, i, j,z;
-	char jlink_error[13] = { ' ', ' ', '*', '*', '*', '*', '*', ' ', 'E', 'r', 'r', 'o', 'r' };
+	char jlink_error[JTAG_LOG_NB_OF_CHARACTERS] = { ' ', ' ', '*', '*', '*', '*', '*', ' ', 'E', 'r', 'r', 'o', 'r' };
 
 	// open log file
 	z = fopen_s(&F1, "jlinklog.txt", "r");
@@ -50,12 +54,12 @@ int check_connection()
 		getchar();
 	}
 	// goto line where error is indicated
-	for (i = 0; i < 41; i++)
-		fgets(tc, 1000, F1);
+	for (i = 0; i < JTAG_LOG_LINE_NUMBER; i++)
+		fgets(tc, JTAG_LOG_MAX_NB_OF_CHARACTERS, F1);
 
 	// compare line
 	r = 1;
-	for (i = 0; i < 13; i++)
+	for (i = 0; i < JTAG_LOG_NB_OF_CHARACTERS; i++)
 		if (jlink_error[i] != tc[i])
 			r = 0;
 
@@ -70,9 +74,6 @@ int check_connection()
 		printf("BINGO\n");
 		return 0;
 	}
-
-	
-
 }
 
 int _tmain(int argc, _TCHAR* argv[])
