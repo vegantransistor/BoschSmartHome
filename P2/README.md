@@ -42,7 +42,7 @@ Here is the full setup:
 
 ![p7](./pictures/p7.png)
 
-We will have to find the probe position manually but a 3D printer may be used as a cheap automatic positioning system (future project). In order to automatize the whole setup, I wrote some small scripts to control the target (try to connect) and the signal generator (generating a reset and program the delay) - my software skills are sufficient for that. The programmed signal generator will then, after the programmed delay, trigger the pulse generator to create the electromagnetic field.
+We have to find the probe position manually. In order to automatize the whole setup, I wrote some small scripts to control the target (try to connect) and the signal generator (generating a reset and program the delay) - my software skills are sufficient for that. The programmed signal generator will then, after the programmed delay, trigger the pulse generator to create the electromagnetic field.
 
 **How to begin the search and find the needle (i.e. the delay)?**
 
