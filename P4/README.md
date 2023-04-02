@@ -47,7 +47,7 @@ ssh root@192.168.2.58
 
 ## Install the Man in the Middle Proxy
 
-Install [mitmproxy](https://mitmproxy.org/) and check the mitm root CA in `~/.mitmproxy`. We will use `pem`, `der`, `crt` and java keystore `jks` formats.
+Install [mitmproxy](https://mitmproxy.org/) and check the mitm root CA in `~/.mitmproxy`. We will use `pem`, `der`, `crt` and java keystore `jks` formats. We use the proxy in [transparent mode](https://docs.mitmproxy.org/stable/howto-transparent/).
 
 ## Replace the Root Certificates in the device
 
@@ -59,7 +59,7 @@ keytool -importcert -keystore bosch-smarthome.jks -file mitmproxy-ca-cert.cer -a
 ```
 
 ## Extract the device certificate
-Each Controller has an own certificate, we need it (and its associated private key) for the proxy connection. Go to `/etc/data/ecm/keys/` and copy `device_chain.pem` and `device_key_pair.pem`. Concatenate both files into one called `device_key_chain.pem`.
+Each Controller has an own certificate, we need it (and its associated private key) for the proxy connection. Go to `/etc/data/ecm/keys/` and copy (`scp`) `device_chain.pem` and `device_key_pair.pem` to the PC. Concatenate both files into one called `device_key_chain.pem`.
 
 ## Start mitmproxy
 
