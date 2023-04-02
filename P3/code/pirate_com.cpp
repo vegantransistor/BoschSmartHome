@@ -41,7 +41,7 @@ int pirate_init_com(int com_nb, int baudrate)
         0// no templates file for COM port...
         );
 
-    config.DCBlength = sizeof(config);
+        config.DCBlength = sizeof(config);
 
 	if (pirate_com_handle == INVALID_HANDLE_VALUE)
 	{
@@ -49,26 +49,26 @@ int pirate_init_com(int com_nb, int baudrate)
 		return 0;
 	}
 
-    if((GetCommState(pirate_com_handle, &config) == 0))
-    {
-        printf("Get configuration port has a problem.\n");
-		return 0;
-    }
+        if((GetCommState(pirate_com_handle, &config) == 0))
+        {
+            printf("Get configuration port has a problem.\n");	
+	    return 0;
+        }
 
-    config.BaudRate = baudrate;
-    config.StopBits = ONESTOPBIT;
-    config.Parity = PARITY_NONE; 
-    config.ByteSize = DATABITS_8;
-    config.fDtrControl = 0;
-    config.fRtsControl = 0;
+        config.BaudRate = baudrate;
+        config.StopBits = ONESTOPBIT;
+        config.Parity = PARITY_NONE; 
+        config.ByteSize = DATABITS_8;
+        config.fDtrControl = 0;
+        config.fRtsControl = 0;
 
-    if (!SetCommState(pirate_com_handle, &config))
-    {
-        printf( "Failed to Set Comm State Reason: %d\n",GetLastError());
-		return 0;
-    }
+        if (!SetCommState(pirate_com_handle, &config))
+        {
+            printf( "Failed to Set Comm State Reason: %d\n",GetLastError());
+	    return 0;
+        }
 	printf("COM %d opened succesfully...", com_nb);
-    printf("Current Settings Baud Rate %d\n", config.BaudRate);
+        printf("Current Settings Baud Rate %d\n", config.BaudRate);
 
 	// set timeout
 	cto.ReadTotalTimeoutConstant = 1;
@@ -79,7 +79,6 @@ int pirate_init_com(int com_nb, int baudrate)
 	pirate_flushrx_uart();
 
 	return 1;
-
 }
 
 int pirate_flushrx_uart()
@@ -99,7 +98,6 @@ int pirate_flushrx_uart()
 	}
 
 	return 1;
-
 }
 
 
