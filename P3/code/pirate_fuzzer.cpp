@@ -9,12 +9,12 @@
 // number of trials
 #define NBTRY 1
 
-// Experimental stuff for smoke detector working on another freuqnecy
+// Experimental stuff for smoke detector working on another frequency
 //#define LONG_PREAMB
 //#define PREAMB_T 1200
 //#define F869_5 // default is 868,0MHz
 
-// Mode: either SNIFFER or TXM_REPLAY
+// Mode: either SNIFFER or TXM_REPLAY (provide txm.txt in that case)
 #define SNIFFER
 //#define TXM_REPLAY
 
@@ -24,7 +24,7 @@
 #define TXAPP
 #endif
 
-// if true random is needed, otherwise deterministic start
+// if true random is needed, otherwise deterministic start (better for reproducibility)
 //#define TRUERANDOM
 #define RAND_N 0
 
