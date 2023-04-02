@@ -1,6 +1,6 @@
 # Set up a Man in the Middle Proxy to sniff TLS traffic
 
-In this article you will learn how to set up a Man-in-the-Middle proxy between the Bosch Smart Home Controller and the Internet.
+In this article you will learn how to set up a Man-in-the-Middle proxy between the Bosch Smart Home Controller and the Internet.  
 
 **Precondition:** [root your controller](https://github.com/vegantransistor/BoschSmartHome/blob/main/P1/README.md)
 
@@ -23,12 +23,12 @@ dhcp-range=192.168.2.50,192.168.2.150,255.255.255.0,12h
 
 ## Set up SSH
 
-Connect the Smart Home Controller to your PC with an Ethernet Cable. Connect the serial interface to your PC and start the SSH daemon on the Smarthome Controller:
+Connect the Smart Home Controller to your PC with an Ethernet Cable. Connect the serial interface to your PC and start the SSH daemon on the Smarthome Controller via the serial interface:
 
 ```
 systemctl start ssh
 ```
-Then SSH the device. First find out the IP address of the device with `ip addr`:
+Find out the IP address of the device with `ip addr`:
 
 ```
 2: eth0: <BROADCAST,MULTICAST,UP,LOWER_UP> mtu 1500 qdisc fq_codel qlen 1000
@@ -40,7 +40,7 @@ Then SSH the device. First find out the IP address of the device with `ip addr`:
     inet6 fe80::66da:a0ff:fe03:4239/64 scope link 
        valid_lft forever preferred_lft forever 
 ```
-Then connect:
+Then connect (password is your password from [1](https://github.com/vegantransistor/BoschSmartHome/blob/main/P1/README.md):
 ```
 ssh root@192.168.2.58
 ```
@@ -51,7 +51,7 @@ Install [mitmproxy](https://mitmproxy.org/) and check the mitm root CA in `~/.mi
 
 ## Replace the Root Certificates in the device
 
-In order to extract the TLS traffic we need to replace the root certificates in the device with the mitm root CA. Some of them are located in `/data/etc/certificates/truststore/` and this directore is not protected by dm-veritiy. Replace all certificates with the mitm root CA certificate. 
+In order to extract TLS traffic we need to replace the root certificates in the device with the mitm root CA. Some of them are located in `/data/etc/certificates/truststore/` and this directore is not protected by dm-veritiy. Replace all certificates with the mitm root CA certificate. 
 
 For the java keystore file, you can add the mitm root CA certificate to the truststore with `keytool` (the password is `key4SH`):
 ```
@@ -83,6 +83,8 @@ mitmproxy --rawtcp --set websocket=false --mode transparent --ssl-insecure --set
 ```
 
 Normally you shall see the traffic in the mitmproxy application - most of the http requests shall be answered with `200`.
+Note that if you export the environmental variable `sslkeyfile` and import it in wireshark (Edit > Preferences > Protocols > TLS > Pre-Master secret log file name) you can also see the decrypted traffic in wireshark.
+
 
 
 
