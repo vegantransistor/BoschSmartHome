@@ -40,7 +40,7 @@ Find out the IP address of the device with `ip addr`:
     inet6 fe80::66da:a0ff:fe03:4239/64 scope link 
        valid_lft forever preferred_lft forever 
 ```
-Then connect (password is your password from [1](https://github.com/vegantransistor/BoschSmartHome/blob/main/P1/README.md):
+Then connect (password is your password from [1](https://github.com/vegantransistor/BoschSmartHome/blob/main/P1/README.md)):
 ```
 ssh root@192.168.2.58
 ```
