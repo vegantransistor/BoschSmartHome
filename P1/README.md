@@ -26,7 +26,7 @@ The next step was to "sniff" the primary UART communication `UART0` which normal
 And this is what came out:
 
 ```
-U-Boot SPL 2013.01.01_1.6.7-g71cce35 (2015-12-08 - 16:13:03)
+U-Boot SPL 
 SHC
 MPU reference clock runs at 6 MHz
 Setting MPU clock to 594 MHz
@@ -38,7 +38,7 @@ reading u-boot.img
 ## Verifying secure image at 807fffc0 ... OK
 
 
-U-Boot 2013.01.01_1.6.7-g71cce35 (2015-12-08 - 16:13:03)
+U-Boot 
 
 I2C:   ready
 DRAM:  512 MiB
