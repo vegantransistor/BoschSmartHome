@@ -14,7 +14,7 @@ We will focus on the main microcontroller, the EFM32 from Silicon Labs (codename
 
 ![p2](./pictures/p2.png)
 
-Regarding debugging interface protection the user manual of the EFM32 says:
+Regarding debugging interface protection the [user manual](https://www.silabs.com/documents/public/reference-manuals/EFM32G-RM.pdf) of the EFM32 says:
 
 ![p3](./pictures/p3.png)
 
@@ -40,13 +40,13 @@ In complex Integrated Circuits, inducing such a fault is like finding a needle i
 
 To produce a strong, local and fast-changing magnetic field, we need a pulse generator with a high voltage (up to a few `kV`) and a magnetic field source. As described in their [blog post](https://limitedresults.com/2021/06/enter-the-efm32-gecko/), "LimitedResults" built a custom EM-FI pulse generator and probe. I'm a bit lazy and I wanted a fast result without building everything from scratch.
 
-In fact, we can take the same equipment used in the field of Electromagnetic Compatibility (EMC) and modify it for our purposes. An `Electrical Fast Transient` (EFT) pulse generator connected to a magnetic field source from Langer EMV is very suitable for our use case. I was lucky enough to find a second-hand Langer BS 06DB-s pulse generator as these devices are usually quite expensive.
+In fact, we can take the same equipment used in the field of Electromagnetic Compatibility (EMC) and modify it for our purposes. An `Electrical Fast Transient` (EFT) pulse generator connected to a magnetic field source from [Langer EMV](https://www.langer-emv.de/en/index) is very suitable for our use case. I was lucky enough to find a second-hand Langer BS 06DB-s pulse generator as these devices are usually quite expensive.
 
-However, there is still a problem: the EFT devices cannot be triggered from an external signal (in some cases they can but with a very high jitter). For EM-FI we need an external trigger with low-jitter in order to reproduce the fault timing. By opening the Langer BS 06DB-s pulse generator (⚠️⚠️⚠️ warning: high voltage ⚠️⚠️⚠️) we can bypass the internal logic and connect an external signal directly to the internal high-voltage switch control input (see image below):
+However, there is still a problem: the EFT devices cannot be triggered from an external signal (in some cases they can but with a very high jitter). For EM-FI we need an external trigger with low-jitter in order to reproduce the fault timing. By opening the [Langer BS 06DB-s](https://www.langer-emv.de/en/product/accessory-eft-burst-generators-iec-61000-4-4/15/h5-ic-set-eft-burst-magnetic-field-source/1283/bs-06du-s-eft-burst-magnetic-field-source/1279) pulse generator (⚠️⚠️⚠️ warning: high voltage ⚠️⚠️⚠️) we can bypass the internal logic and connect an external signal directly to the internal high-voltage switch control input (see image below):
 
 ![p6](./pictures/p6.png)
 
-We now have a pulse generator and a magnetic field source but we still need some kind of programmable delay line. The EM-FI sequence begins with an event (e.g., a Reset pulse) followed by a delay (low jitter) and then the pulse itself. The delay shall be programmable to automate and repeat the sequence. For this, I used a Rigol Signal Generator with an external trigger input that can be controlled remotely.
+We now have a pulse generator and a magnetic field source but we still need some kind of programmable delay line. The EM-FI sequence begins with an event (e.g., a Reset pulse) followed by a delay (low jitter) and then the pulse itself. The delay shall be programmable to automate and repeat the sequence. For this, I used a [Rigol Signal Generator](https://www.rigol.eu/products/waveform-generators/dg800.html) with an external trigger input that can be controlled remotely.
 
 The full setup is depicted in the figure below:
 
@@ -60,7 +60,7 @@ Finding the right timing when to induce a fault can be very tricky. In my case t
 
 ![p8](./pictures/p8.png)
 
-You scan see the different measurements in the screenshot below: the power trace depicted in green for `unlock` and the red colored trace for `lock`. We can easily identify the power consumption differences by having a close look at the trace. The time between those differences and the reset signal gives us the delay.
+You scan see the different measurements in the screenshot below: the power trace depicted in green for `unlock` and the red colored trace for `lock`. We can easily identify the power consumption differences by having a close look at the trace. The time between those differences and the reset signal (trigger for the measurement) gives us the delay.
 
 ![p9](./pictures/p9.png)
 
@@ -76,7 +76,7 @@ And finally we have an open debugging interface! Note that the EM-FI does not ch
 
 ![p11](./pictures/p11.png)
 
-With Segger J-Flash we can extract the whole flash content:
+With [Segger J-Flash](https://www.segger.com/products/debug-probes/j-link/tools/j-flash/about-j-flash/) we can extract the whole flash content:
 
 ![p12](./pictures/p12.png)
 
