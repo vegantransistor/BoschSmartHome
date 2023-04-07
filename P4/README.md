@@ -6,6 +6,12 @@ In this post you will learn how to set up [mitmproxy](https://mitmproxy.org/) to
 
 First of all, you have to root your device to install mitmproxy's CA certificate. See [here](https://github.com/vegantransistor/BoschSmartHome/blob/main/P1/README.md) on how to do that.
 
+## Setup
+
+Here is a simple block diagram of the setup used:
+
+![setup](./pictures/setup.png)
+
 ## Set up dnsmasq
 
 On your Linux machine prepare the Ethernet connection that is connected to the Bosch Smart Home Controller. In this example we are using the following configuration:
