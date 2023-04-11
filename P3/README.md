@@ -18,7 +18,7 @@ Let's open the device and look for the RF module:
 
 ![p2](./pictures/p2.png)
 
-On the image above we see the transceiver module connected to the black quarter-lamda wire antenna. Note, that I bypassed the `230 V` to `12 V` power supply for safety reasons and supplied the device with `12 V` directly. In order to reverse engineer the physical layer we need information about the transceiver module. The heart of this module is a Texas Instrument (TI) Integrated Circuit (IC), the CC1101. From the specification:
+On the image above we see the transceiver module connected to the black quarter-lamda wire antenna. Note, that I bypassed the `230 V` to `12 V` power supply for safety reasons and supplied the device with `12 V` directly. In order to reverse engineer the physical layer we need information about the transceiver module. The heart of this module is a Texas Instrument (TI) Integrated Circuit (IC), the CC1101. From the [specification](https://www.ti.com/lit/ds/symlink/cc1101.pdf):
 
 ![p3](./pictures/p3.png)
 
@@ -42,7 +42,7 @@ To access and configure the Bus Pirate in raw SPI mode (it's faster than normal 
 
 ![p6](./pictures/p6.png)
 
-## Attacking the Link Layer
+## Protocol Link Layer
 
 The CC1101 does not only handle the physical layer but also parts of the link layer. This is the packet format:
 
@@ -146,4 +146,4 @@ In this post we described how to reverse engineer parts of a proprietary communi
 
 ## Reponsible Disclosure
 
-The results of this work have been shared with Bosch PSIRT (2021-11-25).
+The results of this work have been shared with Bosch PSIRT (2021-11-25). A fix has been implemented. 
