@@ -42,37 +42,40 @@ FILE * F1;
 
 int check_connection()
 {
+	FILE* file;
 	char tc[JTAG_LOG_MAX_NB_OF_CHARACTERS];
-	unsigned int r, i, j,z;
+	unsigned int i;
 	char jlink_error[JTAG_LOG_NB_OF_CHARACTERS] = { ' ', ' ', '*', '*', '*', '*', '*', ' ', 'E', 'r', 'r', 'o', 'r' };
 
 	// open log file
-	z = fopen_s(&F1, "jlinklog.txt", "r");
-	if (z != 0)
+	if (fopen_s(&file, "jlinklog.txt", "r") != 0)
 	{
-		printf("FILE ERROR %d!\n",z);
-		getchar();
+		printf("FILE ERROR!\n");
+		return -1; // Return error code to indicate file open error
 	}
-	// goto line where error is indicated
+
+	// go to line where error is indicated
 	for (i = 0; i < JTAG_LOG_LINE_NUMBER; i++)
-		fgets(tc, JTAG_LOG_MAX_NB_OF_CHARACTERS, F1);
+	{
+		if (fgets(tc, JTAG_LOG_MAX_NB_OF_CHARACTERS, file) == NULL)
+		{
+			fclose(file);
+			printf("ERROR: Unable to read from file!\n");
+			return -1; // Return error code to indicate file read error
+		}
+	}
+
+	fclose(file);
 
 	// compare line
-	r = 1;
-	for (i = 0; i < JTAG_LOG_NB_OF_CHARACTERS; i++)
-		if (jlink_error[i] != tc[i])
-			r = 0;
-
-	fclose(F1);
-
-	if (r == 1)
+	if (strncmp(tc, jlink_error, JTAG_LOG_NB_OF_CHARACTERS) == 0)
 	{
-		return -1;
+		printf("BINGO\n");
+		return -1; // Return -1 to indicate error
 	}
 	else
 	{
-		printf("BINGO\n");
-		return 0;
+		return 0; // Return 0 to indicate success
 	}
 }
 
