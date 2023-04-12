@@ -1,7 +1,6 @@
 // control of the RIGOL Signal Generator
 
 #include "rigol.h"
-#include "stdafx.h"
 #include "visa.h"
 #include "string.h"
 
