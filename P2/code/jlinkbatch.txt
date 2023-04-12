@@ -1,0 +1,3 @@
+log jlinklog.txt
+connect
+exit
