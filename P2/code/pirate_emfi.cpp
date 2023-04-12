@@ -79,12 +79,12 @@ int check_connection()
 	}
 }
 
-int _tmain(int argc, _TCHAR* argv[])
+int main(int argc, char* argv[])
 {
-	unsigned int i,r;
+	unsigned int i, r;
 	unsigned int trial, delay;
 
-	// RIGOL generator sometimes do not apply configuration correctly, check before launching!
+	// RIGOL generator sometimes does not apply configuration correctly, check before launching!
 	printf("!!! WARNING! CHECK IF PULSE NEG IS 0V !!!\n");
 	getchar();
 
@@ -96,12 +96,13 @@ int _tmain(int argc, _TCHAR* argv[])
 	rigol_open();
 	rigol_out_on();
 	rigol_set_delay_ns(INIT_DELAY);
+
 #ifdef INFINITE
-	while (1) 
+	while (1)
 #endif
 	{
 		Beep(500, 500);
-		for (delay = INIT_DELAY; delay < END_DELAY; delay = delay + DELAY_DELTA)
+		for (delay = INIT_DELAY; delay < END_DELAY; delay += DELAY_DELTA)
 		{
 			rigol_set_delay_ns(delay);
 			Sleep(100);
@@ -109,12 +110,14 @@ int _tmain(int argc, _TCHAR* argv[])
 			for (trial = 0; trial < TRY_PER_DEL; trial++)
 			{
 				printf("T%d D%d\n", trial, delay);
+
 #ifdef BUSPIRATE
 				// reset
 				Sleep(100);
 				set_aux_high();
 				Sleep(100);
 #endif
+
 #ifdef TARGET
 				// launch jlink, try to connect
 				system("jlink -device EFM32G210F128 -if SWD -speed 4000 -CommanderScript jlinkbatch.txt >> jtest.txt");
@@ -130,6 +133,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				}
 				system("del jtest.txt");
 #endif
+
 #ifdef BUSPIRATE
 				set_aux_low();
 #endif
@@ -137,6 +141,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			}
 		}
 	}
+
 	rigol_out_off();
 	rigol_close();
 
@@ -148,5 +153,4 @@ int _tmain(int argc, _TCHAR* argv[])
 	printf("Press any key...");
 	getchar();
 	return 0;
-
 }
