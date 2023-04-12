@@ -1,6 +1,5 @@
 // bus pirate driver
 
-#include "stdafx.h"
 #include "stdlib.h"
 #include "pirate_com.h"
 
