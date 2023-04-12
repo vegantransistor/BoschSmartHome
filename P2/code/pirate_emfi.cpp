@@ -1,6 +1,5 @@
 // EM-FI loop with RIGOL signal gen control and JTAG test via SEGGER J-Link
 
-#include "stdafx.h"
 #include "visa.h"
 #include "rigol.h"
 #include "pirate_driver.h"
