@@ -1,6 +1,5 @@
 // simple 868 MHz smart home fuzzer
 
-#include "stdafx.h"
 #include "pirate_com.h"
 #include "pirate_trx.h"
 #include <time.h>
