@@ -10,4 +10,4 @@ In this repo you will find some nice hacks on the Bosch Smart Home devices. Enjo
 
 [Part 4: Set up a Man in the Middle proxy to sniff TLS traffic for the SHC](./P4/)
 
-[Part 5: Set up a Man in the Middle proxy to sniff TLS traffic for the APP](./P5/)
+[Part 5: # Set up mitmproxy to sniff TLS traffic between Bosch Smart Home App and Cloud](./P5/)
