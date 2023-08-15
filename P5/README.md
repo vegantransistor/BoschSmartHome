@@ -3,8 +3,7 @@
 In this post you will learn how to set up [mitmproxy](https://mitmproxy.org/) to intercept TLS traffic between the Bosch Smart Home App and the Bosch Smart Home Controller to sniff th traffic. 
 Three steps are needed: 
 1. modify the app by injecting our own CA certificate to the trusted key store
-2. extract the SHC device certificate and key
-3. run mitmproxy
+2. TODO
 
 ## Prerequisites
 
@@ -78,33 +77,4 @@ Sign the modified apk with apksigner:
 ```
 
 Install the `boschmodsigned.apk` in android emulator and start, this shall work!
-
-## Extract the SHC device certificate and key
-
-Since the app is communicating with the SHC device with mTLS, mitmproxy also needs the device certificate and key (client certificate).
-
-Having a SHC rooted with `SSH` in place, extract (`SCP`)following files:
-```
-/data/etc/keys/device_chain.pem
-/data/etc/keys/device_key_pair.pem
-```
-
-Concatenate both in one file (key and certificate chain, needed by mitmproxy):
-```
-cp device_key_pair.pem device_key_chain.pem
-cat device_chain.pem >> device_key_chain.pem
-```
-
-## Run mitmproxy
-
-Run mitmproxy in regular mode (change the pathes to your certificates):
-
-```
-mitmproxy --mode regular@8081 --ssl-insecure --set confdir=MITMCERT/ --set tls_version_client_max=TLS1_2 --set tls_version_server_max=TLS1_2 --set client_certs=CERT/device_key_chain.pem
-```
-
-Start the Bosch Smart Home app on Android emulator and set up the Smart Home Controller (the controller has to be in the same network as your PC). Put the mac address and key manually. Normally, the SHC won't be found by the app. Put its IP address manually `Enter IP address` and then it will be found. As soon as the configuration is done, we can redirect tre Android emulator traffic to the mitmproxy: in the `Extended Controls`, `settings`, tab `proxy`, switch to `manual proxy configuration` with the IP address of the PC running mitmproxy and port `8081`.
-
-
-Now the traffic shall be visible in mitmproxy!
 
