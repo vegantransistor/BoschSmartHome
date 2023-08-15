@@ -2,13 +2,18 @@
 
 In this post you will learn how to set up [mitmproxy](https://mitmproxy.org/) to intercept TLS traffic between the Bosch Smart Home App and the Bosch Smart Home Cloud. Warning: this setup only works in a remote setting involving the cloud, i.e. app and SHC are **not** in the same network.
 
+There are two ways to run TLS interception with mitmproxy:
+1. Modifying the app and rebuilding it
+2. Using frida
 
 ## Prerequisites
 
  * Android emulator with a device running (I'm using Android 11, API30, newer versions shall work too). Use a device w/o playstore to be able to root it.
  * mitmproxy installed
  
-## Modify the Bosch Smart Home App
+## Modifying the Bosch Smart Home App
+
+This is the first possibility.
 
 Download the last Bosch Smart Home App (apk file), e.g. boschsh.apk
   
@@ -74,6 +79,40 @@ Sign the modified apk with apksigner:
 ```
 
 Install the `boschmodsigned.apk` in android emulator and start, this shall work!
+
+## Using frida
+
+This is the second possibility.
+
+Download and install the Bosch Smart Home App. Install the mitmproxy CA certificate in Android truststore as described [here](https://docs.mitmproxy.org/stable/howto-install-system-trusted-ca-android/).
+
+Download the last frida server version for your architecture (I'm using x84_64 for my Android emulator) from [here](https://github.com/frida/frida/releases). 
+
+Copy it to your Android device:
+```
+adb push frida-server /data/local/tmp/.
+```
+
+Run the frida server (root privilege needed):
+```
+adb shell
+cd /data/local/tmp/
+./frida-server
+```
+
+Start the Bosch Smart Home App. Then note the pid ot the App with:
+```
+frida-ps -U
+```
+
+Download [this frida script](https://github.com/httptoolkit/frida-android-unpinning/blob/main/frida-script.js) to bypass certificate pinning.
+
+Run the script:
+```
+frida -p [pid] -U -l frida-script.js
+```
+
+Done!
 
 ## Run mitmproxy
 
