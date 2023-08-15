@@ -86,7 +86,7 @@ This is the second possibility.
 
 Download and install the Bosch Smart Home App. Install the mitmproxy CA certificate in Android truststore as described [here](https://docs.mitmproxy.org/stable/howto-install-system-trusted-ca-android/).
 
-Download the last frida server version for your architecture (I'm using x84_64 for my Android emulator) from [here](https://github.com/frida/frida/releases). 
+Download the last frida server version for Android on your architecture (I'm using x86_64 for the emulator) from [here](https://github.com/frida/frida/releases). 
 
 Copy it to your Android device:
 ```
