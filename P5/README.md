@@ -97,7 +97,7 @@ Run mitmproxy in regular mode (change the pathes to your certificates):
 mitmproxy --mode regular@8081 --ssl-insecure --set confdir=MITMCERT/ --set tls_version_client_max=TLS1_2 --set tls_version_server_max=TLS1_2 --set client_certs=CERT/device_key_chain.pem
 ```
 
-Start the Bosch Smart Home app on Android emulator and set up the Smart Home Controller (the controller has to be in the same network as your PC). Put the mac address and key manually. Normally, the SHC won't be found by the app. Put its IP address manually `Enter IP address` and then it will be found.
+Start the Bosch Smart Home app on Android emulator and set up the Smart Home Controller (the controller has to be in the same network as your PC). Put the mac address and key manually. Normally, the SHC won't be found by the app. Put its IP address manually `Enter IP address` and then it will be found. As soon as the configuration is done, we can redirect tre Android emulator traffic to the mitmproxy: in the `Extended Controls`, `settings`, tab `proxy`, switch to `manual proxy configuration` with the IP address of the PC running mitmproxy and port `8081`.
 
 
 Then start the app on Android emulator. Go to the extended controls, settings, proxy tab. 
