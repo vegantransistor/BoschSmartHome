@@ -45,10 +45,10 @@ Oh, we need the "secret". Open the original apk file in `jadx` and search for "t
 
 For each bks files, add your own mitmproxy CA certificate:
 ```
-  keytool -import -keystore MNf.bks -file [path]/mitmproxy-ca-cert.pem -provider "org.bouncycastle.jce.provider.BouncyCastleProvider" -providerPath "[path]/bcprov-jdk18on-176.jar" -storetype bks
+  keytool -import -keystore [name].bks -file [path]/mitmproxy-ca-cert.pem -provider "org.bouncycastle.jce.provider.BouncyCastleProvider" -providerPath "[path]/bcprov-jdk18on-176.jar" -storetype bks
 ```
 
-Go back and re-zip the content (warning: resources.arsc has to be uncompressed!):
+Go back and re-zip the content (warning: `resources.arsc` has to be uncompressed!):
 ```
   cd ..
   zip -r -n "resources.arsc" boschmod.apk *
@@ -59,7 +59,7 @@ Align:
   zipalign -p -f -v 4 boschmod.apk boschmodaligned.apk
 ```
 
-Sign the apk with our own key (a rooted android emulator accepts it):
+Sign the apk with your own key (a rooted android emulator accepts it):
 
 Create a key store:
 ```
