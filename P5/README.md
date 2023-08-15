@@ -6,7 +6,13 @@ Three steps are needed:
 2. extract the SHC device certificate and key
 3. run mitmproxy
 
-## Modifying the Bosch Smart Home App
+## Prerequisites
+
+ * Android emulator with a device running (I'm using Android 11, API30, newer versions shall work too). Use a device w/o playstore to be able to root it.
+ * mitmproxy installed
+ * a SHC rooted and accessible per SSH (see [here](./../P1/README.md) and [here](./../P4/README.md)).
+
+## Modify the Bosch Smart Home App
 
 Download the last Bosch Smart Home App (apk file), e.g. boschsh.apk
   
@@ -23,7 +29,7 @@ Unzip the apk file and then remove it:
   rm boschsh.apk
 ```
 
-Go to META-INF directory and delete following files (do not delete this directory completely as stated in many tutorials!):
+Go to the META-INF directory and delete following files (do not delete this directory completely as stated in many tutorials!):
 ```
   ANDROIDA.RSA  
   ANDROIDA.SF  
@@ -43,7 +49,7 @@ Try to list certificates from one bks file (donwload the provider from here: htt
 
 Oh, we need the "secret". Open the original apk file in `jadx` and search for "truststore" (case insensitive) in the code. The "secret" is located in the package `com.bosch.sh.connector.certificate.server` (but that's not really a secret). Try again `keytool -list` with this secret, this shall work.
 
-For each bks files, add your own mitmproxy CA certificate:
+For **each** bks files, add your own mitmproxy CA certificate:
 ```
   keytool -import -keystore [name].bks -file [path]/mitmproxy-ca-cert.pem -provider "org.bouncycastle.jce.provider.BouncyCastleProvider" -providerPath "[path]/bcprov-jdk18on-176.jar" -storetype bks
 ```
@@ -71,7 +77,7 @@ Sign the modified apk with apksigner:
   apksigner sign --ks apkkeystore.jks --in boschmodaligned.apk --out boschmodsigned.apk
 ```
 
-Install the apk in android emulator and start, this shall work!
+Install the `boschmodsigned.apk` in android emulator and start, this shall work!
 
 ## Extract the SHC device certificate and key
 
