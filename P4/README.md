@@ -38,6 +38,12 @@ Now, connect the Smart Home Controller to the Ethernet and serial interface of y
 $ systemctl start ssh
 ```
 
+Change the firewall rules in `/data/etc/firewall/firewall_config` to:
+```
+export FIREWALL_INCOMING_LEVEL=0
+export FIREWALL_OUTGOING_LEVEL=0
+```
+
 In the next step, find out the IP address of the device via `ip addr`:
 
 ```
