@@ -86,6 +86,13 @@ This is the second possibility.
 
 Download and install the Bosch Smart Home App. Install the mitmproxy CA certificate in Android truststore as described [here](https://docs.mitmproxy.org/stable/howto-install-system-trusted-ca-android/).
 
+Install frida on your pc:
+
+```
+pip3 install frida-tools
+pip3 install frida
+```
+
 Download the last frida server version for Android on your architecture (I'm using x86_64 for the emulator) from [here](https://github.com/frida/frida/releases). 
 
 Copy it to your Android device:
@@ -101,14 +108,14 @@ cd /data/local/tmp/
 ./frida-server
 ```
 
-Start the Bosch Smart Home App. Then note the pid ot the App with:
+Start the Bosch Smart Home App. Then note the pid ot the App with (pc):
 ```
 frida-ps -U
 ```
 
 Download [this frida script](https://github.com/httptoolkit/frida-android-unpinning/blob/main/frida-script.js) to bypass certificate pinning.
 
-Run the script:
+Run the script on the pc:
 ```
 frida -p [pid] -U -l frida-script.js
 ```
