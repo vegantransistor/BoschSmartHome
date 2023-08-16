@@ -93,7 +93,7 @@ Copy it to your Android device:
 adb push frida-server /data/local/tmp/.
 ```
 
-Run the frida server (root privilege needed):
+Run the frida server (root privileges needed):
 ```
 adb shell
 cd /data/local/tmp/
