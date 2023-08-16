@@ -95,6 +95,7 @@ adb push frida-server /data/local/tmp/.
 
 Run the frida server (root privileges needed):
 ```
+adb root
 adb shell
 cd /data/local/tmp/
 ./frida-server
