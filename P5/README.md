@@ -43,7 +43,7 @@ Patch the keystores, these are located in the `res/` directory with the extensio
   find . -name '*.bks'
 ```
 
-Try to list certificates from one bks file (donwload the provider from here: https://www.bouncycastle.org/latest_releases.html):
+Try to list certificates from one bks file (download the provider from here: https://www.bouncycastle.org/latest_releases.html):
 ```
   keytool -list -keystore [name].bks -provider "org.bouncycastle.jce.provider.BouncyCastleProvider" -providerPath "bcprov-jdk18on-176.jar" -storetype bks
 ```
