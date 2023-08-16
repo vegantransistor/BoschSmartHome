@@ -1,6 +1,6 @@
 # Set up mitmproxy to sniff TLS traffic between Bosch Smart Home App and Cloud
 
-In this post you will learn how to set up [mitmproxy](https://mitmproxy.org/) to intercept TLS traffic between the Bosch Smart Home App and the Bosch Smart Home Cloud. Warning: this setup only works in a remote setting involving the cloud, i.e. app and SHC are **not** in the same network.
+In this post you will learn how to set up [mitmproxy](https://mitmproxy.org/) to intercept TLS traffic between the Bosch Smart Home App and the Bosch Smart Home Cloud. Warning: this setup only works in a remote setting involving the cloud, i.e. app and Smart Home Controller are **not** in the same network.
 
 There are two ways to run TLS interception with mitmproxy:
 1. Modifying the app and rebuilding it
